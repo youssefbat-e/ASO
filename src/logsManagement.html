@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Manage Logs</title>
+  </head>
+  <body>
+    <h2>Manage Logs</h2>
+
+    <form action="/cgi-bin/log_entry.sh" method="post">
+      Log Entry: <input type="text" name="log_entry" required />
+      <input type="submit" value="Submit" />
+    </form>
+
+    <hr />
+
+    <h3>Logs</h3>
+    <pre>
+        <!-- Include logs using SSI -->
+        <!--#include virtual="/cgi-bin/display_logs.sh" -->
+    </pre>
+
+    <form action="/cgi-bin//scripts/display_logs.sh" method="get">
+      Filter Logs: <input type="text" name="filter_text" />
+      <input type="submit" value="Filter" />
+    </form>
+  </body>
+</html>
