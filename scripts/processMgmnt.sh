@@ -2,8 +2,6 @@
 
 echo "Content-type: text/html"
 echo
-outputPs=$(ps -aux)
-
 # HTML header
 echo "<!DOCTYPE html>"
 echo "<html lang='en'>"
