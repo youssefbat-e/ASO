@@ -2,21 +2,20 @@
 
 echo "Content-type: text/html"
 echo
-read -p "Enter PID: " pid
-pidCorrect="${pid:4}"
-read -p "Enter STATUS: " status
-echo "$status"
+IFS='&'
+read -r -d ' ' USER_INPUT
+echo "user input: $USER_INPUT"
 outputPs=$(ps -aux)
 header=$(echo "$outputPs" | head -n 1)
 outputPs=$(echo "$outputPs" | tail -n +2)
 
-if [ -n "$pidCorrect" ]; then
-    outputFinal=$(echo "$outputPs" | grep "[ ]$pidCorrect ")
-    outputPs=$outputFinal
-fi
-
-if [ -n "$statusCorrect" ]; then
-    outputFinal=$(echo "$outputPs" | awk -v status="$statusCorrect" '$10 == status')
+if [ -n "$USER_INPUT" ]; then
+# Use the read command to split the input string
+    read -ra array <<< "$USER_INPUT"
+    pid="${array[0]:4}"
+    status="${array[1]:7}"
+    echo "pid: $pid status: $status"
+    outputFinal=$(echo "$outputPs" | grep "[ ]$pid")
     outputPs=$outputFinal
 fi
 
@@ -24,8 +23,8 @@ PrintTable() {
     echo "<table>"
     echo "<tr>"
     for ((j = 1; j <= 11; j++)); do
-            column=$(echo "$header" | awk -v col=$j '{print $col}')
-            echo "<td>$column</td>"
+        column=$(echo "$header" | awk -v col=$j '{print $col}')
+        echo "<td>$column</td>"
     done
     echo "</tr>"
     while read -r line; do
@@ -36,7 +35,7 @@ PrintTable() {
         done
         echo "</tr>"
     done <<< "$outputPs"
-echo "</table>"
+    echo "</table>"
 }
 
 # HTML header
@@ -50,16 +49,18 @@ echo "</head>"
 echo "<body>"
 echo "<h1>PROCESSES INFO</h1>"
 echo "<br></br>"
-echo "<form action="/scripts/processMgmnt.sh" method="post">"
-echo "      PID: <input type="text" name="pid" /></br />"
-echo "      STATUS: <input type="text" name="status" /></br />"
-echo "      <input type="submit" value="Search" />"
+echo "<form action='/scripts/processMgmnt.sh' method='post'>"
+echo "      <label for=\"pid\">PID:</label>"
+echo "      <input type=\"text\" id=\"pid\" name=\"pid\" placeholder=\"pid\" required><br>"
+echo "      <label for=\"status\">Status:</label>"
+echo "      <input type=\"text\" id=\"status\" name=\"status\" placeholder=\"Optional\"><br>"
+echo "  <input type='submit' value='Search' />"
 echo "</form>"
 echo "<br></br>"
 if [ -n "$outputPs" ]; then
-echo "<table border='1'>"
-PrintTable
-echo "</table>"
+    echo "<table border='1'>"
+    PrintTable
+    echo "</table>"
 fi
 echo "</body>"
 echo "</html>"
