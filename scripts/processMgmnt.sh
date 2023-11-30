@@ -5,7 +5,6 @@ echo
 read -p "Enter PID: " pid
 pidCorrect="${pid:4}"
 read -p "Enter STATUS: " status
-echo "$status"
 outputPs=$(ps -aux)
 header=$(echo "$outputPs" | head -n 1)
 outputPs=$(echo "$outputPs" | tail -n +2)
@@ -16,7 +15,7 @@ if [ -n "$pidCorrect" ]; then
 fi
 
 if [ -n "$statusCorrect" ]; then
-    outputFinal=$(echo "$outputPs" | awk -v status="$statusCorrect" '$10 == status')
+    outputFinal=$(echo "$outputPs" | grep "[ ]$statusCorrect ")
     outputPs=$outputFinal
 fi
 
