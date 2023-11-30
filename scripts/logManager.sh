@@ -2,18 +2,24 @@
 
 log_operation() {
     operation="$1"
-    logger -t "WebApp" "$operation"
+    logger -t "$operation"
 }
 
 display_logs() {
     filter="$1"
     
+    echo "<h2>Display Logs</h2>"
+    echo "<pre>"
+
     if [ -n "$filter" ]; then
         grep "$filter" /var/log/syslog
     else
         cat /var/log/syslog
     fi
+
+    echo "</pre>"
 }
+
 
 read -r -d '' QUERY_STRING
 
@@ -43,7 +49,7 @@ echo "  <input type=\"text\" id=\"filter\" name=\"filter\">"
 echo "  <input type=\"submit\" value=\"Display Logs\">"
 echo "</form>"
 
-filter_criteria=$(echo "$QUERY_STRING" | grep -oP '\K.*')
+filter_criteria=$(echo "$QUERY_STRING" | grep -o 'filter=\K.*')
 display_logs "$filter_criteria"
 
 echo "</body>"
