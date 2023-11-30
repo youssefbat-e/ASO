@@ -15,15 +15,17 @@ display_logs() {
     if [ -n "$filter" ]; then
         grep "$filter" /var/log/sys.log
     else
-        cat /var/log/sys.log
+        #cat /var/log/sys.log
+        outputPs=$(cat "/var/log/sys.log" | tail -n +2)
+        echo "$outputPs"
     fi
 
     echo "</pre>"
 }
 
 
-read -r -d '' QUERY_STRING
-
+read -r -d ' ' QUERY_STRING
+QUERY_STRING="${QUERY_STRING:7}"
 # HTML header
 echo "Content-type: text/html"
 echo
@@ -45,14 +47,14 @@ echo "<p>Operation logged successfully.</p>"
 echo "<p>Debug: QUERY_STRING = $QUERY_STRING</p>"
 
 echo "<h2>Display Logs</h2>"
-echo "<form method=\"get\" action=\"/scripts/logManager.sh\">"
+echo "<form method=\"post\" action=\"/scripts/logManager.sh\">"
 echo "  <label for=\"filter\">Filter (optional):</label>"
 echo "  <input type=\"text\" id=\"filter\" name=\"filter\">"
 echo "  <input type=\"submit\" value=\"Display Logs\">"
 echo "</form>"
 
-filter_criteria=$(echo "$QUERY_STRING" | grep -o 'filter=\K.*')
-display_logs "$filter_criteria"
+#filter_criteria=$(echo "$QUERY_STRING" | grep -o 'filter=\K.*')
+display_logs "$QUERY_STRING"
 
 echo "</body>"
 echo "</html>"
