@@ -43,7 +43,7 @@ echo "  <input type=\"text\" id=\"filter\" name=\"filter\">"
 echo "  <input type=\"submit\" value=\"Display Logs\">"
 echo "</form>"
 
-filter_criteria=$(echo "$QUERY_STRING" | grep -oP 'filter=\K.*')
+filter_criteria=$(echo "$QUERY_STRING" | grep -oP '\K.*')
 display_logs "$filter_criteria"
 
 echo "</body>"

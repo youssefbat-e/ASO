@@ -3,6 +3,19 @@
 echo "Content-type: text/html"
 echo
 
+display_navigation_bar() {
+    echo "<header>"
+    echo "  <nav>"
+    echo "    <ul>"
+    echo "      <li><a href=\"/scripts/monitoring.sh\">Monitoring</a></li>"
+    echo "      <li><a href=\"/scripts/logManager.sh\">Log Manager</a></li>"
+    echo "      <li><a href=\"/scripts/processMgmnt.sh\">Process Management</a></li>"
+    echo "      <li><a href=\"/scripts/packetFiltering.sh\">Packet Filtering</a></li>"
+    echo "    </ul>"
+    echo "  </nav>"
+    echo "</header>"
+}
+
 #get server resources (CPU, memory, disk)
 get_server_resources() {
     echo "<h2>Server Resources</h2>"
@@ -35,6 +48,8 @@ echo "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.
 echo "    <title>Monitoring</title>"
 echo "</head>"
 echo "<body>"
+display_navigation_bar
+
 get_server_resources
 get_last_accesses
 get_server_uptime
