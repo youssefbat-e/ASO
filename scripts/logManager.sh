@@ -7,14 +7,15 @@ log_operation() {
 
 display_logs() {
     filter="$1"
-    
+
+    echo $filter
     echo "<h2>Display Logs</h2>"
     echo "<pre>"
 
     if [ -n "$filter" ]; then
-        grep "$filter" /var/log/syslog
+        grep "$filter" /var/log/sys.log
     else
-        cat /var/log/syslog
+        cat /var/log/sys.log
     fi
 
     echo "</pre>"
@@ -36,11 +37,12 @@ echo "    <title>Managing Logs</title>"
 echo "</head>"
 echo "<body>"
 
-if [ -n "$QUERY_STRING" ]; then
-    # Log the operation
-    log_operation "User performed operation: $QUERY_STRING"
-    echo "<p>Operation logged successfully.</p>"
-fi
+
+log_operation "User performed operation: $QUERY_STRING"
+echo "<p>Operation logged successfully.</p>"
+
+# Debug: Display the QUERY_STRING
+echo "<p>Debug: QUERY_STRING = $QUERY_STRING</p>"
 
 echo "<h2>Display Logs</h2>"
 echo "<form method=\"get\" action=\"/scripts/logManager.sh\">"
