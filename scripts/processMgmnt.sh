@@ -16,7 +16,7 @@ if [ -n "$USER_INPUT" ]; then
     status="${array[1]:7}"
     seconds="${array[2]:8}"
     choice="${array[3]:7}"
-    user="lfs"
+    user=$(whoami)
 
     if [ -n "$pid" ]; then
         outputPs=$(echo "$outputPs" | awk -v pid="$pid" '$2 == pid')
@@ -76,5 +76,7 @@ if [ -n "$outputPs" ]; then
     echo "</pre>"
     echo "</table>"
 fi
+echo "<br></br>"
+echo "<a href=\"/scripts/mainMenu.sh\">Back</a></li>"
 echo "</body>"
 echo "</html>"

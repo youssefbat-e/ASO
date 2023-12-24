@@ -4,20 +4,40 @@ echo "Content-type: text/html"
 echo
 
 check_credentials() {
-    # Replace the following with your actual username and password
-    passwdFile=$(cat /etc/passwd | cut -d: -f1) 
-    IFS=' ' read -ra usernames <<< "$passwdFile"
+    IFS=$'\n' read -d '' -ra systemUsernames < <(awk -F: '{ print $1 }' /etc/passwd)
+    valid_user=false
+    login_correct=false
 
-    for user in "${usernames[@]}"; do
+    for user in "${systemUsernames[@]}"; do
         # Check if entered credentials are valid
         if [ "$username" == "$user" ]; then
-            if echo "$password" | passwd --stdin "$username" >/dev/null 2>&1; then
-                echo "Hello $username!"
-            else
-                echo "User or password incorrect. Try again :("
-            fi
+            valid_user=true
+            break
         fi
     done
+
+    if [ "$valid_user" = true ]; then
+        stored_password=$(sudo getent shadow $username)
+        IFS=':' read -ra passwdString <<< "$stored_password"
+        stored_final="${passwdString[1]}" 
+        # Hash the provided password using OpenSSL
+        IFS='$' read -ra elements <<< "$stored_password"
+        salt="${elements[2]}"
+        #echo "stored: $stored_final"
+        hashed_password=$(sudo openssl passwd -6 -salt $salt $password)
+       # echo "hashed: $hashed_password"
+        # Compare the stored password with the hashed provided password
+        if [ "$stored_final" == "$hashed_password" ]; then
+            login_correct=true;
+            echo "correct!"
+            username=""
+            password=""
+        else
+            echo "Password is not correct. Try again :("
+        fi
+    else
+        echo "User not found. Try again :("
+    fi
 }
 # Parse the form data
 IFS='&'
@@ -51,5 +71,11 @@ echo "      <input type=\"password\" id=\"password\" name=\"password\" placehold
 echo "      <br>"
 echo "      <input type=\"submit\" value=\"Login\">"
 echo "    </form>"
+echo "  <form method=\"post\" action=\"/scripts/logout.sh\">"
+echo "      <input type=\"submit\" value=\"Logout\">"
+echo "    </form>"
+if [ "$login_correct" = true ]; then
+    echo "<a href=\"/scripts/mainMenu.sh\">Go to Main Menu</a>"
+fi
 echo "  </body>"
 echo "</html>"
