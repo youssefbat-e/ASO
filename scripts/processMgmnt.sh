@@ -1,9 +1,11 @@
 #!/bin/bash
 
 echo "Content-type: text/html"
-echo
+echo 
+
 IFS='&'
 read -r -d ' ' USER_INPUT
+
 outputPs=$(ps -aux)
 header=$(echo "$outputPs" | head -n 1)
 outputPs=$(echo "$outputPs" | tail -n +2)
@@ -16,7 +18,7 @@ if [ -n "$USER_INPUT" ]; then
     status="${array[1]:7}"
     seconds="${array[2]:8}"
     choice="${array[3]:7}"
-    user=$(whoami)
+    user=$(cat temp_file)
 
     if [ -n "$pid" ]; then
         outputPs=$(echo "$outputPs" | awk -v pid="$pid" '$2 == pid')
@@ -59,13 +61,14 @@ echo "      <input type=\"text\" id=\"status\" name=\"status\" placeholder=\"sta
 echo "      <label for=\"seconds\">Seconds to stop:</label>"
 echo "      <input type=\"text\" id=\"seconds\" name=\"seconds\" placeholder=\"Seconds\"><br>"
 echo "      <br>"
+echo "  <input type='submit' value='Apply' />"
 echo "      <h3>Remove all my Processes?</h3>"
 echo "      <label for=\"choice_yes\">YES</label>"
 echo "      <input type="checkbox" id="choice_yes" name="choice" value="yes">"
 echo "      <label for=\"choice_no\">NO</label>"
 echo "      <input type="checkbox" id="choice_no" name="choice" value="no">"
 echo "      <br>"
-echo "  <input type='submit' value='Apply' />"
+echo "  <input type='submit' value='Delete' />"
 echo "</form>"
 echo "<br></br>"
 if [ -n "$outputPs" ]; then

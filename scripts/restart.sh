@@ -1,18 +1,19 @@
 #!/bin/bash
 
-/etc/init.d/httpd restart
-
 echo "Content-type: text/html"
 echo
+
+/etc/init.d/httpd restart
 
 echo "<!DOCTYPE html>"
 echo "<html lang=\"en\">"
 echo "<head>"
 echo "    <meta charset=\"UTF-8\">"
-echo "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">"
-echo "    <title>Restarting System</title>"
+echo "    <meta http-equiv=\"refresh\" content=\"0;url=http://192.168.21.10/scripts/index.sh\">"
+echo "    <title>Redirecting...</title>"
 echo "</head>"
 echo "<body>"
-echo " <p>System Restarted</p>"
+echo "    <p>If you are not redirected, <a href=\"/scripts/index.sh\">click here</a>.</p>"
 echo "</body>"
 echo "</html>"
+

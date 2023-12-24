@@ -52,9 +52,14 @@ echo "  <label for=\"filter\">Filter (optional):</label>"
 echo "  <input type=\"text\" id=\"filter\" name=\"filter\">"
 echo "  <input type=\"submit\" value=\"Display Logs\">"
 echo "</form>"
+echo "<br></br>"
 
 #filter_criteria=$(echo "$QUERY_STRING" | grep -o 'filter=\K.*')
 display_logs "$QUERY_STRING"
-
+echo "<h3>Do you want to backup your logs?"
+echo "<form method=\"post\" action=\"/scripts/backupLogs.sh\">"
+echo "  <input type=\"submit\" value=\"Backup Logs\">"
+echo "</form>"
+echo "<a href=\"/scripts/mainMenu.sh\">Back</a></li>"
 echo "</body>"
 echo "</html>"

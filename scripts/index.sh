@@ -29,9 +29,7 @@ check_credentials() {
         # Compare the stored password with the hashed provided password
         if [ "$stored_final" == "$hashed_password" ]; then
             login_correct=true;
-            echo "correct!"
-            username=""
-            password=""
+            sudo echo "$username" > temp_file
         else
             echo "Password is not correct. Try again :("
         fi
@@ -71,11 +69,8 @@ echo "      <input type=\"password\" id=\"password\" name=\"password\" placehold
 echo "      <br>"
 echo "      <input type=\"submit\" value=\"Login\">"
 echo "    </form>"
-echo "  <form method=\"post\" action=\"/scripts/logout.sh\">"
-echo "      <input type=\"submit\" value=\"Logout\">"
-echo "    </form>"
 if [ "$login_correct" = true ]; then
-    echo "<a href=\"/scripts/mainMenu.sh\">Go to Main Menu</a>"
+    echo "    <meta http-equiv=\"refresh\" content=\"0;url=http://192.168.21.10/scripts/mainMenu.sh\">"
 fi
 echo "  </body>"
 echo "</html>"
