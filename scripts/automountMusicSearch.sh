@@ -10,12 +10,6 @@ mount_device(){
     sudo cd /mnt/$folder
 }
 
-umount_device(){
-    sudo umount /dev/$check_device
-    sudo eject /dev/$check_device
-    sudo rm -Rf /mnt/$folder
-}
-
 IFS='&'
 read -r -d ' ' USER_INPUT
 
@@ -34,14 +28,23 @@ if [ -n "$USER_INPUT" ]; then
             echo "Device being mounted"
             mount_device
             content=$(ls /mnt/$folder)
-            echo "$content"
+            mkfile music
+            for song in $content; do
+                IFS='.' read -ra extension <<< "$song"
+                if [ "${extension[1]}" == "mp4" ]; then
+                    echo "${extension[0]}:/mnt/$folder/$song" >> music
+                fi
+            done
+            musicContents=$(cat music)
         else
             echo "Device not detected."
         fi
     if [ -n "$choice" ]; then
         if [ "$choice" == "yes" ]; then
             echo "Device being unmounted"
-            umount_device
+            sudo umount /dev/$check_device
+            sudo eject /dev/$check_device
+            sudo rm -Rf /mnt/$folder
         else 
             echo "not taken off"
         fi
@@ -73,6 +76,10 @@ echo "      <br>"
 echo "  <input type='submit' value='Delete' />"
 echo "</form>"
 echo "<br></br>"
+echo "<h6>Music File Contents: </h6>"
+if [ -n $musicContents ]; then
+echo "<pre>$musicContents</pre>"
+fi
 echo "<br></br>"
 echo "<a href=\"/scripts/mainMenu.sh\">Back</a></li>"
 echo "</body>"
