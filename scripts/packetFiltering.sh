@@ -1,28 +1,50 @@
 #!/bin/bash
 
-#display current firewall rules
 display_firewall_rules() {
     echo "<h2>Current Firewall Rules</h2>"
-    iptables -L -n -v --line-numbers
+    echo "<pre>"
+    iptables -L
+    echo "</pre>"
 }
 
-# add a new firewall rule
+
 add_firewall_rule() {
-    protocol="$1"
-    source_ip="$2"
-    destination_ip="$3"
-    port="$4"
+    if [ -n "$QUERY_STRING" ]; then
+        IFS='&' read -ra params <<< "$QUERY_STRING"
 
-    # Add rule creation logic using iptables
-    iptables -A INPUT -p "$protocol" --source "$source_ip" --destination "$destination_ip" --dport "$port" -j ACCEPT
+        protocol=""
+        source_ip=""
+        destination_ip=""
+        port=""
 
-    echo "<p>Firewall rule added successfully:</p>"
-    echo "<pre>Protocol: $protocol, Source IP: $source_ip, Destination IP: $destination_ip, Port: $port</pre>"
+        for param in "${params[@]}"; do
+            IFS='=' read -r key value <<< "$param"
+
+            case "$key" in
+                "protocol")
+                    protocol="$value"
+                    ;;
+                "source_ip")
+                    source_ip="$value"
+                    ;;
+                "destination_ip")
+                    destination_ip="$value"
+                    ;;
+                "port")
+                    port="$value"
+                    ;;
+            esac
+        done
+
+        iptables -A INPUT -p "$protocol" --source "$source_ip" --destination "$destination_ip" --dport "$port" -j ACCEPT
+
+        echo "<p>Firewall rule added successfully:</p>"
+        echo "<pre>Protocol: $protocol, Source IP: $source_ip, Destination IP: $destination_ip, Port: $port</pre>"
+    fi
 }
 
-read -r -d '' QUERY_STRING
+read -r -d ' ' QUERY_STRING
 
-# HTML header
 echo "Content-type: text/html"
 echo
 
@@ -35,24 +57,14 @@ echo "    <title>Packet Filtering</title>"
 echo "</head>"
 echo "<body>"
 
-# Check if the form is submitted
 if [ -n "$QUERY_STRING" ]; then
-    # Extract form data
-    protocol=$(echo "$QUERY_STRING" | grep -oP 'protocol=\K[^&]*')
-    source_ip=$(echo "$QUERY_STRING" | grep -oP 'source_ip=\K[^&]*')
-    destination_ip=$(echo "$QUERY_STRING" | grep -oP 'destination_ip=\K[^&]*')
-    port=$(echo "$QUERY_STRING" | grep -oP 'port=\K.*')
-
-    # Add a new firewall rule
     add_firewall_rule "$protocol" "$source_ip" "$destination_ip" "$port"
 fi
 
-# Display current firewall rules
 display_firewall_rules
 
-# Display form to add a new firewall rule
 echo "<h2>Add Firewall Rule</h2>"
-echo "<form method=\"get\" action=\"/scripts/packetFiltering.sh\">"
+echo "<form method=\"post\" action=\"/cgi-bin/packetFiltering.sh\">"
 echo "  <label for=\"protocol\">Protocol:</label>"
 echo "  <input type=\"text\" id=\"protocol\" name=\"protocol\" placeholder=\"tcp/udp\" required><br>"
 echo "  <label for=\"source_ip\">Source IP:</label>"
@@ -66,3 +78,4 @@ echo "</form>"
 
 echo "</body>"
 echo "</html>"
+
