@@ -1,72 +1,59 @@
 #!/bin/bash
 
-display_firewall_rules() {
-    echo "<h2>Current Firewall Rules</h2>"
-    echo "<pre>"
-    iptables -L
-    echo "</pre>"
-}
-
-
-add_firewall_rule() {
-    if [ -n "$QUERY_STRING" ]; then
-        IFS='&' read -ra params <<< "$QUERY_STRING"
-
-        protocol=""
-        source_ip=""
-        destination_ip=""
-        port=""
-
-        for param in "${params[@]}"; do
-            IFS='=' read -r key value <<< "$param"
-
-            case "$key" in
-                "protocol")
-                    protocol="$value"
-                    ;;
-                "source_ip")
-                    source_ip="$value"
-                    ;;
-                "destination_ip")
-                    destination_ip="$value"
-                    ;;
-                "port")
-                    port="$value"
-                    ;;
-            esac
-        done
-
-        iptables -A INPUT -p "$protocol" --source "$source_ip" --destination "$destination_ip" --dport "$port" -j ACCEPT
-
-        echo "<p>Firewall rule added successfully:</p>"
-        echo "<pre>Protocol: $protocol, Source IP: $source_ip, Destination IP: $destination_ip, Port: $port</pre>"
-    fi
-}
-
-read -r -d ' ' QUERY_STRING
-
 echo "Content-type: text/html"
 echo
 
+IFS='&'
+read -r -d '' QUERY_STRING
+echo "$QUERY_STRING"
+iptables=$(sudo iptables -L -v -n --line-numbers)
+# Check if the form is submitted
+if [ -n "$QUERY_STRING" ]; then
+    decoded_input=$(printf '%b' "${QUERY_STRING//%/\\x}")
+# Use the read command to split the input string
+    read -ra array <<< "$decoded_input"
+    protocol="${array[0]:9}"
+    echo "protocol: $protocol"
+    source_ip="${array[1]:10}"
+     echo "source ip: $source_ip"
+    destination_ip="${array[2]:15}"
+     echo "destination ip: $destination_ip"
+    port="${array[3]:5}"
+     echo "port: $port"
+    number="${array[4]:7}"
+     echo "number: $number"
+    if [ -n "$protocol" ] && [ -n "$source_ip" ] && [ -n "$destination_ip" ] && [ -n "$port" ]; then
+        sudo iptables -A INPUT -p "$protocol" --source "$source_ip" --destination "$destination_ip" --dport "$port" -j ACCEPT
+    elif  [ -n "$protocol" ] && [ -n "$source_ip" ] && [ -n "$destination_ip" ]; then
+        sudo iptables -A INPUT -p "$protocol" --source "$source_ip" --destination "$destination_ip" -j ACCEPT
+    elif [ -n "$protocol" ] && [ -n "$source_ip" ]; then
+        sudo iptables -A INPUT -p "$protocol" --source "$source_ip" -j ACCEPT
+    elif [ -n "$protocol" ]; then 
+        sudo iptables -A INPUT -p "$protocol" -j ACCEPT
+    fi
+    if [ -n "$number" ]; then 
+        sudo iptables -D INPUT $number
+    fi
+    iptables=$(sudo iptables -L -v -n --line-numbers) 
+fi
+
+# HTML header
 echo "<!DOCTYPE html>"
 echo "<html lang=\"en\">"
+
 echo "<head>"
 echo "    <meta charset=\"UTF-8\">"
 echo "    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">"
 echo "    <title>Packet Filtering</title>"
 echo "</head>"
 echo "<body>"
-
-if [ -n "$QUERY_STRING" ]; then
-    add_firewall_rule "$protocol" "$source_ip" "$destination_ip" "$port"
-fi
-
-display_firewall_rules
-
+echo "<h2>Current Firewall Rules</h2>"
+echo "<pre>$iptables</pre>"
+# Display form to add a new firewall rule
 echo "<h2>Add Firewall Rule</h2>"
-echo "<form method=\"post\" action=\"/cgi-bin/packetFiltering.sh\">"
+echo "<form method=\"post\" action=\"/scripts/packetFiltering.sh\">"
 echo "  <label for=\"protocol\">Protocol:</label>"
-echo "  <input type=\"text\" id=\"protocol\" name=\"protocol\" placeholder=\"tcp/udp\" required><br>"
+echo "  <input type=\"text\" id=\"protocol\" name=\"protocol\" placeholder=\"tcp/udp\" ><br>"
 echo "  <label for=\"source_ip\">Source IP:</label>"
 echo "  <input type=\"text\" id=\"source_ip\" name=\"source_ip\" placeholder=\"Optional\"><br>"
 echo "  <label for=\"destination_ip\">Destination IP:</label>"
@@ -74,8 +61,12 @@ echo "  <input type=\"text\" id=\"destination_ip\" name=\"destination_ip\" place
 echo "  <label for=\"port\">Port:</label>"
 echo "  <input type=\"text\" id=\"port\" name=\"port\" placeholder=\"Optional\"><br>"
 echo "  <input type=\"submit\" value=\"Add Rule\">"
+echo "<h2>Delete Firewall Rule</h2>"
+echo "  <label for=\"number\">Number:</label>"
+echo "  <input type=\"text\" id=\"number\" name=\"number\" placeholder=\"rule num\" ><br>"
+echo "  <input type=\"submit\" value=\"Delete Rule\">"
 echo "</form>"
-
+echo "<br></br>"
+echo "<a href=\"/scripts/mainMenu.sh\">Back</a></li>"
 echo "</body>"
 echo "</html>"
-
