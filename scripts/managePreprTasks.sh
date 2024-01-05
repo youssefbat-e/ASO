@@ -2,46 +2,30 @@
 
 echo "Content-type: text/html"
 echo
+
+currentUser=$(cat temp_file)
+preprTasks=$(fcrontab -l)
+
 IFS='&'
 read -r -d ' ' USER_INPUT
 
-currentUser=$(whoami)
-
-preprTasksFilesHourly=$(ls /etc/cron.hourly)
-preprTasksFilesDaily=$(ls /etc/cron.daily)
-preprTasksFilesWeekly=$(ls /etc/cron.weekly)
-preprTasksFilesMonthly=$(ls /etc/cron.monthly)
-
 if [ -n "$USER_INPUT" ]; then
     decoded_input=$(printf '%b' "${USER_INPUT//%/\\x}")
-# Use the read command to split the input string
-    read -ra array <<< "$decoded_input"
-    name="${array[0]:5}"
-    frequency="${array[1]:9}"
-    echo "$frequency"
-    path="${array[2]:5}"
-    IFS=' '
-    read -ra my_frequency <<< "$frequency"
-    echo "$my_frequency[0]"
-
-    if [ -n "$my_frequency[1]" ]; then
-        if [ -n "$path" ]; then
-            if [ "$my_frequency[1]" == "sec" ]; then
-                cd /etc/cron.hourly
-                touch $name
-                echo "#!/bin/bash while true; do $path sleep $my_frequency[0] done" >> $name
-            fi
-            if [ "$my_frequency[1]" == "min" ]; then
-            fi
-            if [ "$my_frequency[1]" == "h" ]; then
-            fi
-            if [ "$my_frequency[1]" == "day" ]; then
-            fi
-            if [ "$my_frequency[1]" == "week" ]; then
-            fi
-            if [ "$my_frequency[1]" == "month" ]; then
-            fi
-        fi
+    cleaned_input=$(echo "$decoded_input" | tr '+' ' ')
+    read -ra array <<< "$cleaned_input"
+    frequency="${array[0]:10}"
+    command="${array[1]:8}"
+    numLine="${array[2]:8}"
+    
+    # Validate and sanitize user input before appending to the file
+    if [ -n "$frequency" ] && [ -n "$command" ]; then
+        lineToWrite="$frequency  $command"
+        (fcrontab -l; echo "$lineToWrite") | fcrontab -
+        preprTasks=$(fcrontab -l)
+    fi
+    if [ -n "$numLine" ]; then
+        (echo "$preprTasks" | sed -e "${numLine}d") | fcrontab -
+        preprTasks=$(fcrontab -l)
     fi
 fi
 
@@ -58,26 +42,21 @@ echo "<h1>PREPROGRAMMED TASKS INFO</h1>"
 echo "<br>"
 echo "<h3>Add a task</h3>"
 echo "<form action='/scripts/managePreprTasks.sh' method='post'>"
-echo "      <label for=\"name\">Name your task:</label>"
-echo "      <input type=\"text\" id=\"name\" name=\"name\" placeholder=\"name\"><br>"
-echo "      <label for=\"frequency\">Every:</label>"
-echo "      <input type=\"text\" id=\"frequency\" name=\"frequency\" placeholder=\"x min/sec/h/day/week/month\"><br>"
-echo "      <label for=\"path\">Path to task:</label>"
-echo "      <input type=\"text\" id=\"path\" name=\"path\" placeholder=\"path to task\"><br>"
+echo "      <label for=\"frequency\">Frequency:</label>"
+echo "      <input type=\"text\" id=\"frequency\" name=\"frequency\" placeholder=\"enter frequency in format * * * * *\"><br>"
+echo "      <label for=\"command\">Task to schedule:</label>"
+echo "      <input type=\"text\" id=\"command\" name=\"command\" placeholder=\"task\"><br>"
 echo "      <br>"
 echo "  <input type='submit' value='Add Task' />"
+echo "<h3>Delete a task</h3>"
+echo "<form action='/scripts/managePreprTasks.sh' method='post'>"
+echo "      <label for=\"numLine\">Number of line to delete:</label>"
+echo "      <input type=\"text\" id=\"numLine\" name=\"numLine\" placeholder=\"line number\"><br>"
+echo "      <br>"
+echo "  <input type='submit' value='Delete Task' />"
 echo "</form>"
 echo "<br></br>"
-if [ -n "$preprTasksFilesHourly" || -n "$preprTasksFilesDaily" || -n "$preprTasksFilesWeekly" || -n "$preprTasksFilesMonthly"]; then
-    echo "<table>"
-    echo "<pre>"
-    echo "$preprTasksFilesHourly"
-    echo "$preprTasksFilesDaily"
-    echo "$preprTasksFilesWeekly"
-    echo "$preprTasksFilesMonthly"
-    echo "</pre>"
-    echo "</table>"
-fi
+echo "<pre>$preprTasks</pre>"
 echo "<br></br>"
 echo "<a href=\"/scripts/mainMenu.sh\">Back</a></li>"
 echo "</body>"
