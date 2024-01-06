@@ -29,7 +29,7 @@ read -r -d ' ' USER_INPUT
                 sudo useradd $username
                 sudo echo "$username:$password" > temp_file
                 # Use chpasswd to update /etc/shadow
-                sudo chpasswd -c SHA512 < temp_file
+                sudo chpasswd -c SHA256 < temp_file
                 rm temp_file
                 systemUsernames=$(awk -F: '{ print $1 }' /etc/passwd)
             fi

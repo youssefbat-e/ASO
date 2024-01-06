@@ -24,7 +24,8 @@ check_credentials() {
         IFS='$' read -ra elements <<< "$stored_password"
         salt="${elements[2]}"
         #echo "stored: $stored_final"
-        hashed_password=$(sudo openssl passwd -6 -salt $salt $password)
+        hashed_password=$(sudo openssl passwd -5 -salt $salt $password)
+        sudo echo "stored_final: $stored_final  hashed_password: $hashed_password"
        # echo "hashed: $hashed_password"
         # Compare the stored password with the hashed provided password
         if [ "$stored_final" == "$hashed_password" ]; then
