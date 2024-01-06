@@ -3,7 +3,7 @@
 echo "Content-type: text/html"
 echo
 
-currentUser=$(cat temp_file)
+currentUser=$(cat usr_loggedIn)
 preprTasks=$(fcrontab -l)
 
 IFS='&'
@@ -21,10 +21,12 @@ if [ -n "$USER_INPUT" ]; then
     if [ -n "$frequency" ] && [ -n "$command" ]; then
         lineToWrite="$frequency  $command"
         (fcrontab -l; echo "$lineToWrite") | fcrontab -
+        sudo /etc/init.d/fcron restart
         preprTasks=$(fcrontab -l)
     fi
     if [ -n "$numLine" ]; then
         (echo "$preprTasks" | sed -e "${numLine}d") | fcrontab -
+        sudo /etc/init.d/fcron restart
         preprTasks=$(fcrontab -l)
     fi
 fi

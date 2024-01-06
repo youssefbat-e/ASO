@@ -29,7 +29,8 @@ check_credentials() {
         # Compare the stored password with the hashed provided password
         if [ "$stored_final" == "$hashed_password" ]; then
             login_correct=true;
-            sudo echo "$username" > temp_file
+            echo "correct!"
+            sudo echo "$username" > usr_loggedIn
         else
             echo "Password is not correct. Try again :("
         fi
@@ -70,7 +71,7 @@ echo "      <br>"
 echo "      <input type=\"submit\" value=\"Login\">"
 echo "    </form>"
 if [ "$login_correct" = true ]; then
-    echo "    <meta http-equiv=\"refresh\" content=\"0;url=http://192.168.21.10/scripts/mainMenu.sh\">"
+   echo "<meta http-equiv=\"refresh\" content=\"0;url=http://192.168.21.10/scripts/mainMenu.sh\">"
 fi
 echo "  </body>"
 echo "</html>"

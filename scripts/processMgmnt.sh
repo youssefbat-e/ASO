@@ -18,7 +18,7 @@ if [ -n "$USER_INPUT" ]; then
     status="${array[1]:7}"
     seconds="${array[2]:8}"
     choice="${array[3]:7}"
-    user=$(cat temp_file)
+    user=$(cat usr_loggedIn)
 
     if [ -n "$pid" ]; then
         outputPs=$(echo "$outputPs" | awk -v pid="$pid" '$2 == pid')

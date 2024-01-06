@@ -3,14 +3,6 @@
 echo "Content-type: text/html"
 echo
 
-shut_down(){
-    /etc/init.d/httpd stop
-}
-
-restart(){
-   /etc/init.d/httpd restart
-}
-
 # HTML header
 echo "<!DOCTYPE html>"
 echo "<html lang=\"en\">"
@@ -31,7 +23,11 @@ echo "      <li><a href=\"/scripts/packetFiltering.sh\">Packet Filtering</a></li
 echo "      <li><a href=\"/scripts/managePreprTasks.sh\">Manage Preprogrammed Tasks</a></li>"
 echo "      <li><a href=\"/scripts/automountMusicSearch.sh\">Search for Music in Drive</a></li>"
 echo "    </ul>"
-echo "   <pre style="width:30px;height:10px;border:1px solid;" onclick="echo "/etc/init.d/httpd stop"">Stop</pre>"
-echo "   <pre style="width:30px;height:10px;border:1px solid;" onclick="echo "/etc/init.d/httpd restart"">Restart</pre>"
+echo "  <form method=\"post\" action=\"/scripts/stop.sh\">"
+echo "      <input type=\"submit\" value=\"Stop\">"
+echo "  </form>"
+echo "  <form method=\"post\" action=\"/scripts/restart.sh\">"
+echo "      <input type=\"submit\" value=\"Restart\">"
+echo "  </form>"
 echo "</body>"
 echo "</html>"
