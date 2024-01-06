@@ -17,7 +17,7 @@ get_server_resources() {
 #get last 10 accesses
 get_last_accesses() {
     echo "<h2>Last 10 Accesses</h2>"
-    last -n 10
+    echo "<pre>$(last -n 10)</pre>"
 }
 
 #get server uptime
