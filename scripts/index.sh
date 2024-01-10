@@ -30,6 +30,8 @@ check_credentials() {
         # Compare the stored password with the hashed provided password
         if [ "$stored_final" == "$hashed_password" ]; then
             login_correct=true;
+            currentUser=$(cat usr_loggedIn)
+            sudo logger -t $currentUser "user logged in correctly"
             echo "correct!"
             sudo echo "$username" > usr_loggedIn
         else

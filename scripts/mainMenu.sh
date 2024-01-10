@@ -3,6 +3,8 @@
 echo "Content-type: text/html"
 echo
 
+currentUser=$(cat usr_loggedIn)
+sudo logger -t $currentUser "user accessed main menu" 
 # HTML header
 echo "<!DOCTYPE html>"
 echo "<html lang=\"en\">"

@@ -3,6 +3,8 @@
 echo "Content-type: text/html"
 echo
 
+currentUser=$(cat usr_loggedIn)
+sudo logger -t $currentUser "user managing users"
 
 systemUsernames=$(awk -F: '{ print $1 }' /etc/passwd)
 IFS=$'\n' read -d '' -ra systemUsernamesArray < <(awk -F: '{ print $1 }' /etc/passwd)

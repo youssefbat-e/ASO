@@ -1,15 +1,11 @@
 #!/bin/bash
 
-log_operation() {
-    operation="$1"
-    logger -t "$operation"
-}
+currentUser=$(cat usr_loggedIn)
+sudo logger -t $currentUser "user managing logs"
 
 display_logs() {
     filter="$1"
-
-    echo $filter
-    echo "<h2>Display Logs</h2>"
+    echo "<h4>Logs Info</h4>"
     echo "<pre>"
 
     if [ -n "$filter" ]; then
@@ -24,8 +20,8 @@ display_logs() {
 }
 
 
-read -r -d ' ' QUERY_STRING
-QUERY_STRING="${QUERY_STRING:7}"
+read -r -d ' ' filter
+operation="${filter:7}"
 # HTML header
 echo "Content-type: text/html"
 echo
@@ -39,12 +35,10 @@ echo "    <title>Managing Logs</title>"
 echo "</head>"
 echo "<body>"
 
-
-log_operation "User performed operation: $QUERY_STRING"
-echo "<p>Operation logged successfully.</p>"
-
-# Debug: Display the QUERY_STRING
-echo "<p>Debug: QUERY_STRING = $QUERY_STRING</p>"
+if [ -n "$operation" ]; then
+    logger -t $currentUser "user applied filter: $operation"
+    echo "<p>Operation logged successfully.</p>"
+fi
 
 echo "<h2>Display Logs</h2>"
 echo "<form method=\"post\" action=\"/scripts/logManager.sh\">"
@@ -52,14 +46,15 @@ echo "  <label for=\"filter\">Filter (optional):</label>"
 echo "  <input type=\"text\" id=\"filter\" name=\"filter\">"
 echo "  <input type=\"submit\" value=\"Display Logs\">"
 echo "</form>"
-echo "<br></br>"
+echo "<br>"
 
 #filter_criteria=$(echo "$QUERY_STRING" | grep -o 'filter=\K.*')
-display_logs "$QUERY_STRING"
 echo "<h3>Do you want to backup your logs?"
 echo "<form method=\"post\" action=\"/scripts/backupLogs.sh\">"
 echo "  <input type=\"submit\" value=\"Backup Logs\">"
 echo "</form>"
-echo "<a href=\"/scripts/mainMenu.sh\">Back</a></li>"
+echo "<br>"
+echo "<a href=\"/scripts/mainMenu.sh\">Back</a>"
+display_logs "$operation"
 echo "</body>"
 echo "</html>"

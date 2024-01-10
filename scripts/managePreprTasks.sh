@@ -4,6 +4,7 @@ echo "Content-type: text/html"
 echo
 
 currentUser=$(cat usr_loggedIn)
+sudo logger -t $currentUser "user managed preprogrammed tasks"
 preprTasks=$(fcrontab -l)
 
 IFS='&'
@@ -16,15 +17,16 @@ if [ -n "$USER_INPUT" ]; then
     frequency="${array[0]:10}"
     command="${array[1]:8}"
     numLine="${array[2]:8}"
-    
     # Validate and sanitize user input before appending to the file
     if [ -n "$frequency" ] && [ -n "$command" ]; then
         lineToWrite="$frequency  $command"
+        logger -t $currentUser "user added programmed task: $lineToWrite"
         (fcrontab -l; echo "$lineToWrite") | fcrontab -
         sudo /etc/init.d/fcron restart
         preprTasks=$(fcrontab -l)
     fi
     if [ -n "$numLine" ]; then
+        logger -t $currentUser "user deleted programmed task in line: $numLine"
         (echo "$preprTasks" | sed -e "${numLine}d") | fcrontab -
         sudo /etc/init.d/fcron restart
         preprTasks=$(fcrontab -l)

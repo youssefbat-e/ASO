@@ -5,6 +5,8 @@ echo "Content-type: text/html"
 echo
 
 # Read user input
+currentUser=$(cat usr_loggedIn)
+sudo logger -t $currentUser "user mounted drive"
 IFS='&'
 read -r -d ' ' USER_INPUT
 

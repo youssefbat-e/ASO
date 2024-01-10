@@ -1,6 +1,8 @@
 #!/bin/bash
 
 # Create a timestamp for the backup folder
+currentUser=$(cat usr_loggedIn)
+sudo logger -t $currentUser "user backed up logs"
 timestamp=$(date +"%Y%m%d%H%M%S")
 backup_folder="/var/logBackups/backup_$timestamp"
 

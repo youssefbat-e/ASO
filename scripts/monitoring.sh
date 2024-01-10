@@ -3,6 +3,9 @@
 echo "Content-type: text/html"
 echo
 
+currentUser=$(cat usr_loggedIn)
+sudo logger -t $currentUser "user monitoring the system"
+
 #get server resources (CPU, memory, disk)
 get_server_resources() {
     echo "<h2>Server Resources</h2>"

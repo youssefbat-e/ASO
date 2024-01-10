@@ -3,6 +3,9 @@
 echo "Content-type: text/html"
 echo 
 
+currentUser=$(cat usr_loggedIn)
+sudo logger -t $currentUser "user managing processes"
+
 IFS='&'
 read -r -d ' ' USER_INPUT
 
@@ -11,6 +14,7 @@ header=$(echo "$outputPs" | head -n 1)
 outputPs=$(echo "$outputPs" | tail -n +2)
 
 if [ -n "$USER_INPUT" ]; then
+    logger -t $currentUser "user applied process filters: $USER_INPUT"
     decoded_input=$(printf '%b' "${USER_INPUT//%/\\x}")
 # Use the read command to split the input string
     read -ra array <<< "$decoded_input"

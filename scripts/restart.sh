@@ -3,6 +3,9 @@
 echo "Content-type: text/html"
 echo
 
+currentUser=$(cat usr_loggedIn)
+sudo logger -t $currentUser "user restaring system"
+
 /etc/init.d/httpd restart
 
 echo "<!DOCTYPE html>"

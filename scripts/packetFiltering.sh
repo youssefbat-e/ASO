@@ -3,6 +3,8 @@
 echo "Content-type: text/html"
 echo
 
+currentUser=$(cat usr_loggedIn)
+sudo logger -t $currentUser "user filtering packets"
 IFS='&'
 read -r -d '' QUERY_STRING
 echo "$QUERY_STRING"
@@ -24,14 +26,19 @@ if [ -n "$QUERY_STRING" ]; then
      echo "number: $number"
     if [ -n "$protocol" ] && [ -n "$source_ip" ] && [ -n "$destination_ip" ] && [ -n "$port" ]; then
         sudo iptables -A INPUT -p "$protocol" --source "$source_ip" --destination "$destination_ip" --dport "$port" -j ACCEPT
+        logger -t $currentUser "user added rule: $protocol $source_ip $destination_ip $port"
     elif  [ -n "$protocol" ] && [ -n "$source_ip" ] && [ -n "$destination_ip" ]; then
         sudo iptables -A INPUT -p "$protocol" --source "$source_ip" --destination "$destination_ip" -j ACCEPT
+        logger -t $currentUser "user added rule: $protocol $source_ip $destination_ip"
     elif [ -n "$protocol" ] && [ -n "$source_ip" ]; then
         sudo iptables -A INPUT -p "$protocol" --source "$source_ip" -j ACCEPT
+        logger -t $currentUser "user added rule: $protocol $source_ip"
     elif [ -n "$protocol" ]; then 
         sudo iptables -A INPUT -p "$protocol" -j ACCEPT
+        logger -t $currentUser "user added rule: $protocol"
     fi
     if [ -n "$number" ]; then 
+        logger -t $currentUser "user deleted packet rule number: $number"
         sudo iptables -D INPUT $number
     fi
     iptables=$(sudo iptables -L -v -n --line-numbers) 
